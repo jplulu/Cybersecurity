@@ -1,22 +1,3 @@
-#
-# [file:#lines]
-# desc
-#
-
-[zookd.c:1612]
-description goes here. for example, the 'buf' variable can be
-overwritten by the 'msg' variable because ...
-
-    <paste offending line(s) of code here>
-
-[http.c:1512]
-another description.
-
-    <paste offending line(s) of code here>
-
-# many more come here
-
-
 ### 1
 [zookd.c:70]
 The size of 'reqpath' buffer is 2048 bytes. This buffer is filled with the request path in the 'url_decode' function in [http.c]

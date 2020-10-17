@@ -1,7 +1,7 @@
 ## Place your answers here.
 
 Ex. 2
-=============
+====================
 
 ./exploit-2a.py
 This exploit triggers the bug in [zookd.c:70]. It sends a request URI that
@@ -12,3 +12,32 @@ http_request_line. This buffer overflow overwrites the return address of the pro
 This exploit triggers the bug in [http.c:282]. It sends a request URI that is longer than the pn[1024] buffer, which is
 filled with the request URI through the unsafe C function strcat(). This buffer overflow overwrites the function pointer
 *handler, which is at a higher address right above the pn buffer.
+
+Ex. 3
+====================
+I chose to exploit the bug in [zookd.c:70] which uses the function process_client(int fd).
+
+Through the use of GDB, I was able to find the addresses for stack buffer, base pointer, and return address of the
+exploited function. Using these I constructed the stack as follows:
+
+       TOP OF STACK
+|stack buffer address + 4 |
+|-------------------------| <- &ebp + 4 (return address)
+| aaaa                    |
+|-------------------------| <- &ebp
+| aaaaaaaaaaaaaaaaaaaaa...|
+|-------------------------|
+| injectcode              |
+|-------------------------| <- stack buffer address + 4
+| /aaa                    |
+|-------------------------| <- stack buffer address
+
+The stack buffer is first filled with '/aaa' to mimic a valid request URI. Then it is filled with the inject code,
+followed by a padding of 'a's until the length of the entire buffer is equal to return address - stack buffer
+address. At this point, the buffer is filled up to the return address. Finally, the buffer is filled with the starting
+address of the inject code (stack buffer address + 4), which modifies the content of the return address. When the function
+tries to return, it will be directed to the start of the injected code, successfully taking over the program.
+
+The buffer overflow vulnerabilities found in Exercise 1 should all be able exploited in this manner since they all have
+the ability to overwrite the content at the return address. Certain modifications to the request URI might be necessary
+since some of the exploited buffers are filled with different contents.

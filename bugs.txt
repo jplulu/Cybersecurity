@@ -15,3 +15,69 @@ another description.
     <paste offending line(s) of code here>
 
 # many more come here
+
+
+### 1
+[zookd.c:70]
+The size of 'reqpath' buffer is 2048 bytes. This buffer is filled with the request path in the 'url_decode' function in [http.c]
+where buffer bounds checking is not implemented. As a result, sending a request path that is longer than 2048 bytes will cause
+buffer overflow.
+
+static void process_client(int fd)
+    char reqpath[2048];
+    ...
+    if ((errmsg = http_request_line(fd, reqpath, env, &env_len)))
+
+
+### 2
+[http.c:159]
+The size of 'value' buffer is 512 bytes. This buffer is filled with the variable 'sp', which is the header field values for a request.
+The function url_decode is used to fill the buffer and it does not implement any bounds checking. Sending a request with the header field
+values larger than 512 bytes can cause buffer overflow.
+
+const char *http_request_headers(int fd)
+    ...
+    char value[512];
+    ...
+    url_decode(value, sp);
+
+
+### 3
+[http.c:165]
+The size of 'envvar' is 512 bytes. This buffer is filled with the variable 'buf', which contains the header filed names for a request.
+The C function sprintf is used to fill it and it does not have bounds checking; furthermore, the maximum size of 'buf' is 8192 bytes,
+which is much more than that of 'envvar'. As a resulting, sending a request with the header field names larger than 512 bytes can cause
+buffer overflow.
+
+const char *http_request_headers(int fd)
+    ...
+    char envvar[512];
+    ...
+    sprintf(envvar, "HTTP_%s", buf);
+	
+
+### 4
+[http.c:282]
+The size of 'pn' buffer is only 1024 bytes. This buffer is filled with the variable 'name', which is the request url for a request, with
+the C function strcat, which does not have bounds checking. Sending a request with the request url larger than 1024 bytes will cause 
+buffer overflow.
+
+void http_serve(int fd, const char *name)
+    char pn[1024];
+    ...
+    strcat(pn, name);
+	
+
+### 5
+[http.c:344]
+The size of 'dst' buffer is 1024 bytes. This buffer is filled with the variable 'dirname', which consists of the the request url
+for a request, with the C function strcpy, which does not have bounds checking. Sending a request with the request url larger than 1024 
+bytes will cause buffer overflow.
+
+void dir_join(char *dst, const char *dirname, const char *filename)
+    strcpy(dst, dirname);
+
+void http_serve_directory(int fd, const char *pn)
+	...
+	dir_join(name, pn, indices[i]);
+

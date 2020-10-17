@@ -4,6 +4,11 @@ Ex. 2
 =============
 
 ./exploit-2a.py
-This exploit sends a request URI that is longer than the reqpath[2048] buffer. It triggers the bug in [zookd.c:70]
-with the function process_client(int fd). The return address is overwritten by the overflow of the reqpath buffer.
+This exploit triggers the bug in [zookd.c:70]. It sends a request URI that
+is longer than the reqpath[2048] buffer, which is filled with the request URI through the unsafe function
+http_request_line. This buffer overflow overwrites the return address of the process_client function.
 
+./exploit-2b.py
+This exploit triggers the bug in [http.c:282]. It sends a request URI that is longer than the pn[1024] buffer, which is
+filled with the request URI through the unsafe C function strcat(). This buffer overflow overwrites the function pointer
+*handler, which is at a higher address right above the pn buffer.

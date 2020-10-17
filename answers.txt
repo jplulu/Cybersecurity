@@ -1,1 +1,9 @@
 ## Place your answers here.
+
+Ex. 2
+=============
+
+./exploit-2a.py
+This exploit sends a request URI that is longer than the reqpath[2048] buffer. It triggers the bug in [zookd.c:70]
+with the function process_client(int fd). The return address is overwritten by the overflow of the reqpath buffer.
+

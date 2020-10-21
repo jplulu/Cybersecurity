@@ -41,3 +41,22 @@ tries to return, it will be directed to the start of the injected code, successf
 The buffer overflow vulnerabilities found in Exercise 1 should all be able exploited in this manner since they all have
 the ability to overwrite the content at the return address. Certain modifications to the request URI might be necessary
 since some of the exploited buffers are filled with different contents.
+
+Ex. 4
+====================
+We can overflow values on the stack without any precaution since stack canaries aren't used. As a result, we can use
+this type of exploits in all the bugs described in bugs.txt.
+
+Ex. 5
+===================
+
+
+Ex. 6
+===================
+The following changes are made to fix the bugs in bugs.txt:
+
+1. [zookd.c:65] char reqpath[2048] -> static char reqpath[2048]
+2. [http.c:120] char value[512] -> static char value[512]
+3. [http.c:165] sprintf(envvar, "HTTP_%s", buf) -> snprintf(envvar, sizeof(envvar), "HTTP_%s", buf)
+4. [http.c:282] strcat(pn, name) -> strncat(pn, name, 1024)
+5. [http.c:344] strcpy(dst, dirname) -> strncpy(dst, dirname, 1024)

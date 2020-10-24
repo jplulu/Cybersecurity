@@ -49,7 +49,18 @@ this type of exploits in all the bugs described in bugs.txt.
 
 Ex. 5
 ===================
+### 1
+[http.c:107]
 
+Here we find 'envp += sprintf(envp, "REQUEST_URI=%s", reqpath) + 1'. Since sprintf does not check for the size of the string
+its putting into envp, we could send a large request URI to overflow envp. The attacker can use this to overwrite the return 
+address and take control of the program. To prevent it, the function snprintf should be used to ensure that a set amount of 
+bytes are put into the buffer.
+
+### 2
+In http.c, the serve_file and serve_directory functions have no authentication or authorization implemented. This means the
+attackers can potentially input any file/directory locations and gain access to the entire database. To prevent this, some
+sort of authentication and authorization scheme needs to be implemented.
 
 Ex. 6
 ===================
